@@ -127,13 +127,13 @@ void adj_list_to_adj_matrix (pnode G, double W[MAXNODES][MAXNODES]){
 	// insert distance not inf or 0
 	pnode node_iter = G;
 	for(int i=0; i<number_nodes; i++){
-		int number_edges = edge_cardinality(G);
+		int number_edges = edge_cardinality(node_iter);
 		pedge edge_iter = get_edges(node_iter);
 
 		for(int j=0; j<number_edges; j++){
 			int weight = get_weight(edge_iter);
 			int node_pos = name_to_pos(G,edge_iter->to);
-			W[number_nodes][node_pos] = weight;
+			W[i][node_pos] = weight;
 			edge_iter = get_next_edge(edge_iter);
 		}
 		node_iter = get_next(node_iter);
@@ -174,6 +174,7 @@ void dijkstra(pnode G, char s, double *d, char *e)
 			pnode adj_node = get_node(G, edg->to);
 			relax(min_d_node, adj_node, get_weight(edg));
 		}
+		qsize--;
 	}
 }
 
@@ -217,6 +218,7 @@ void prim(pnode G, char start_node, double *d, char *e)
 				set_d(adj_node, get_d(min_d_node)+get_weight(edg));
 			}
 		}
+		qsize--;
 	}
 }
 
