@@ -217,7 +217,7 @@ pedge upd_edge(pedge E, double weight)
 // _add_edge: creates and connects new edge to edge-list
 pedge _add_edge(pedge E, char to, double weight)
 {
-	if(E == NULL){
+	if(edge_empty(E)){
 		E = create_edge(to, weight);
 	}
 
@@ -238,11 +238,6 @@ pedge _add_edge(pedge E, char to, double weight)
 
 
 	return E;
-
-
-
-
-
 
 }
 // add_edge: adds an edge to G by finding correct start node
@@ -271,6 +266,7 @@ bool _find_edge(pedge E, char to)
 		}
 	}
 
+	return true;
 
 }
 // find_edge: returns true if edge between from and to exists, false otherwise
@@ -343,6 +339,9 @@ pedge _rem_edge(pedge E, char to)
 {
 	// TODO
 	return E;
+
+
+
 }
 // rem_edge: removes edge from G
 void rem_edge(pnode G, char from, char to)
@@ -408,5 +407,40 @@ char pos_to_name(pnode G, int pos)
 // list_to_pos: creates adjacency matrix from adjacency list
 void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES])
 {
-	// TODO
+
+	if(is_empty(G)){
+		return;
+	}
+
+
+	for (int i = 0; i < MAXNODES; i++) {
+        for (int j = 0; j < MAXNODES; j++) {
+            matrix[i][j] = 0;
+        }
+    }
+	
+	pnode current = G;
+
+	for(int i = 0; i < node_cardinality(G); i++){
+
+		current = get_node(G, pos_to_name(G, i));
+		printf("c %c\n", current->name);	
+
+
+
+		for(int j = 0; j < _edge_cardinality(current->edges); j++){
+			printf("hje");
+
+		}
+
+
+
+
+
+
+
+
+	}
+
 }
+
