@@ -83,21 +83,76 @@ pnode node_cons(pnode first, pnode second)
 //           in graph, nothing is done
 pnode add_node(pnode G, char nname)
 {
-	// TODO
+
+	if(G == NULL){
+		G = create_node(nname);
+		return G;
+	}
+
+	if (find_node(G, nname)) {
+		printf("node alredy exists \n");
+		return G;
+	}
+
+	pnode current = G;
+	pnode newnode = create_node(nname);
+
+	if(nname < G->name){
+		node_cons(newnode, G);
+		return newnode;
+	}
+	while (current->next_node != NULL && current->next_node->name < newnode->name){
+		current = current->next_node;
+	}
+	node_cons(newnode, current->next_node);
+	node_cons(current, newnode);
+
 	return G;
+	
 }
 // rem_node: removes node with name name from adjacency list G
 //           if node does not exist, nothing happens
 pnode rem_node(pnode G, char name)
-{
-	// TODO
-	return G;
+{	
+
+	if (find_node(G, name) == false) {
+		printf("node does not exist \n");
+		return G;
+	}
+
+	if (G->name == name){
+		G = G->next_node;
+		return G;
+	}
+
+	pnode current = G; 
+
+	while(current->next_node != NULL){
+		printf("%c   ", 	current->name);
+		printf("%c   \n", 	name);
+
+		if(current->next_node->name == name){
+			node_cons(current, current->next_node->next_node);
+			break;
+		}
+		current = current->next_node;
+	}
+	 
+	return G; 
 }
 // get_node: returns pointer to node with name name from adjacency list G
 pnode get_node(pnode G, char name)
 {
-	// TODO
+
+	while(G->next_node != NULL){
+
+		if(G->name == name){
+			break; 
+		}
+		G = G->next_node;
+	}
 	return G;
+
 }
 // get_node: returns true if node with name name exists in adjacency list G
 //           false otherwise
@@ -155,42 +210,119 @@ pedge edge_cons(pedge first, pedge second)
 pedge upd_edge(pedge E, double weight)
 {
 	// TODO
+
+	
 	return E;
 }
 // _add_edge: creates and connects new edge to edge-list
 pedge _add_edge(pedge E, char to, double weight)
 {
-	// TODO
+	if(E == NULL){
+		E = create_edge(to, weight);
+	}
+
+	pedge newedge = create_edge(to, weight);
+	pedge current = E;
+	
+	if(to < E->to){
+		edge_cons(newedge, E);
+		return newedge;
+	}
+
+
+	while (current->next_edge != NULL && current->next_edge->to < newedge->to){
+		current = current->next_edge;
+	}
+	edge_cons(newedge, current->next_edge);
+	edge_cons(current, newedge);
+
+
 	return E;
+
+
+
+
+
+
 }
 // add_edge: adds an edge to G by finding correct start node
 //           and then calling _add_edge to create new edge
 void add_edge(pnode G, char from, char to, double weight)
 {
-	// TODO
+
+	pnode current = get_node(G, from);
+
+	current->edges = _add_edge(current->edges, to, weight);
+
 }
 // _find_edge: finds edge in edge-list
 bool _find_edge(pedge E, char to)
 {
-	// TODO
-	return false;
+	if(edge_empty(E)){
+		return false; 
+	}
+
+	else{
+		if(E->to == to){
+			return true;
+		}
+		else{
+			_find_edge(E->next_edge, to);
+		}
+	}
+
+
 }
 // find_edge: returns true if edge between from and to exists, false otherwise
 bool find_edge(pnode G, char from, char to)
 {
+	
+	pnode current = get_node(G, from);
+
+	if(_find_edge(current->edges, to)){
+		return true; 
+		}
+	else{
+		return false;
+	}
+	
+	
 	// TODO
-	return false;
+
+	
 }
 // _edge_cardinality: returns the number of edges from one node
 int _edge_cardinality(pedge E)
 {
-	// TODO
+
+	if (E == NULL){
+		return 0;
+	}
+	int count  = 0; 
+	while(E->next_edge != NULL){
+		E = E->next_edge;
+		count++;
+	}
+	return count;
+
 	return 0;
 }
 // edge_cardinality: returns the total number of edges in G
 int edge_cardinality(pnode G)
 {
-	return 0;
+	if(is_empty(G)){
+		return 0; 
+	}
+	int count = 0;
+
+	while(G->next_node != NULL){
+		count = count + _edge_cardinality(G->edges);
+		G = G->next_node;
+
+		}
+
+	return count; 
+	
 }
 // _self_loops: returns the number of edges going back to
 //              source node
@@ -230,20 +362,48 @@ void remove_all_edges_from(pnode G, char name)
 // node_cardinality: returns the number of nodes in G
 int node_cardinality(pnode G)
 {
-	// TODO
-	return 0;
+
+	if(is_empty(G)){
+		return 0; 
+	}
+
+
+	int count  = 0; 
+	while(G->next_node != NULL){
+		G = G->next_node;
+		count++;
+	}
+
+
+
+	return count+1;
 }
 // name_to_pos: returns position of node with name c, -1 if not found
 int name_to_pos(pnode G, char c)
 {
-	// TODO
+	int count = 0; 
+
+	while(G->next_node != NULL){
+
+		if(G->name == c){
+			return count; 
+		}
+		G = G->next_node;
+		count++;
+	}
+	
 	return -1;
 }
 // pos_to_name: returns name of node at position pos in G
 char pos_to_name(pnode G, int pos)
 {
-	// TODO
-	return '-';
+	if(is_empty(G)){
+		return '-';
+	} 
+	for(int i = 0; i < pos; i++){
+		G = G->next_node;
+	}
+	return G->name;	
 }
 // list_to_pos: creates adjacency matrix from adjacency list
 void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES])

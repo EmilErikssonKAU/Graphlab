@@ -27,6 +27,8 @@ typedef struct node {
 	pedge edges;      // pointer to first (if any) edge from node
 	pnode next_node;  // pointer to next node (if any) in adjlist
 } node;
+
+
 bool is_empty(pnode G);
 char get_name(pnode G);
 pnode get_next(pnode G);
