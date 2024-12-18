@@ -455,7 +455,7 @@ int name_to_pos(pnode G, char c)
 {
 	int count = 0; 
 
-	while(G->next_node != NULL){
+	while(G != NULL){
 
 		if(G->name == c){
 			return count; 
@@ -482,42 +482,30 @@ char pos_to_name(pnode G, int pos)
 
 
 // list_to_pos: creates adjacency matrix from adjacency list
-void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES])
-{
-
-	if(is_empty(G)){
-		return;
-	}
+void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES]) {
+    if (is_empty(G)) {
+        return;
+    }
 
 
-	for (int i = 0; i < MAXNODES; i++) {
+    for (int i = 0; i < MAXNODES; i++) {
         for (int j = 0; j < MAXNODES; j++) {
             matrix[i][j] = 0;
         }
     }
-	
-	pnode current = G;
 
-	for(int i = 0; i < node_cardinality(G); i++){
+    
+    for (int i = 0; i < node_cardinality(G); i++) {
+        pnode current = get_node(G, pos_to_name(G, i));
 
-		current = get_node(G, pos_to_name(G, i));
-		printf("c %c\n", current->name);	
+       
 
-
-
-		for(int j = 0; j < _edge_cardinality(current->edges); j++){
-			printf("hje");
-
-		}
-
-
-
-
-
-
-
-
-	}
-
+        pedge currentedge = get_edges(current);
+        while (currentedge != NULL) {
+            int pos = name_to_pos(G, currentedge->to);
+                matrix[i][pos] = 1;
+            currentedge = currentedge->next_edge;
+        }
+    }
 }
 
