@@ -133,6 +133,8 @@ pnode ui_add_node(pnode G)
 	val = get_choice("Enter value to be added> ");
 	if (echo)
 		printf("%d\n", val);
+
+	
 	return isalpha(val) ? add_node(G, val) : G;
 }
 
