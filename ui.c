@@ -135,6 +135,7 @@ pnode ui_add_node(pnode G)
 		printf("%d\n", val);
 	return isalpha(val) ? add_node(G, val) : G;
 }
+
 void ui_add_edge(bool directed, pnode G)
 {
 	if (is_empty(G))
@@ -158,6 +159,7 @@ pnode ui_rem_node(pnode G)
 		printf("%d\n", val);
 	return rem_node(G, val);
 }
+
 void ui_rem_edge(bool directed, pnode G)
 {
 	if (is_empty(G))

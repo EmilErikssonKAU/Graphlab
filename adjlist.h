@@ -27,6 +27,7 @@ typedef struct node {
 	pedge edges;      // pointer to first (if any) edge from node
 	pnode next_node;  // pointer to next node (if any) in adjlist
 } node;
+
 bool is_empty(pnode G);
 char get_name(pnode G);
 pnode get_next(pnode G);
@@ -50,4 +51,8 @@ int name_to_pos(pnode G, char c);
 char pos_to_name(pnode G, int pos);
 void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES]);
 int self_loops(pnode G);
+
+// tillagd "själva"
+pedge get_next_edge(pedge E);
+double get_weight(pedge E);
 #endif

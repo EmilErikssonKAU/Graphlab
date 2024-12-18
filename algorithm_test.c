@@ -15,6 +15,7 @@ typedef struct an_edge{
 	char to;
 	double weight;
 }an_edge;
+
 typedef struct dijkstra_test{
 	int size_node;
 	char adds[MAXNODES];
@@ -24,6 +25,7 @@ typedef struct dijkstra_test{
 	double d[MAXNODES];
 	char pi[MAXNODES];
 }dijkstra_test;
+
 typedef struct flwa_test{
 	int size_node;
 	char adds[MAXNODES];
@@ -31,6 +33,7 @@ typedef struct flwa_test{
 	an_edge add_edges[MAXNODES*MAXNODES];
 	double table[MAXNODES][MAXNODES];
 }flwa_test;
+
 dijkstra_test dtests[] = {
 	{2, {'a', 'b'}, 1, {{'a', 'b', 1}}, 'a', { 0, 1 }, { '-', 'a' }},
     {2, {'a', 'b'}, 1, {{'b', 'a', 1}}, 'b', { 1, 0 }, { 'b', '-' }},
@@ -64,6 +67,7 @@ dijkstra_test dtests[] = {
 	{6, {'a', 'b', 'c', 'd', 'e', 'f'}, 22, {{'a', 'b', 9}, {'a', 'c', 13}, {'a', 'd', 7}, {'b', 'a', 9}, {'b', 'c', 2}, {'b', 'e', 3}, {'b', 'f', 5}, {'c', 'a', 13}, {'c', 'b', 2}, {'c', 'd', 1}, {'c', 'e', 5}, {'d', 'a', 7}, {'d', 'c', 1}, {'d', 'e', 9}, {'d', 'f', 3}, {'e', 'b', 3}, {'e', 'c', 5}, {'e', 'd', 9}, {'e', 'f', 1}, {'f', 'b', 5}, {'f', 'd', 3}, {'f', 'e', 1}}, 'd', {7, 3, 1, 0, 4, 3}, {'d','c','d','-','f','d'}},
 	{6, {'a', 'b', 'c', 'd', 'e', 'f'}, 22, {{'a', 'b', 9}, {'a', 'c', 13}, {'a', 'd', 7}, {'b', 'a', 9}, {'b', 'c', 2}, {'b', 'e', 3}, {'b', 'f', 5}, {'c', 'a', 13}, {'c', 'b', 2}, {'c', 'd', 1}, {'c', 'e', 5}, {'d', 'a', 7}, {'d', 'c', 1}, {'d', 'e', 9}, {'d', 'f', 3}, {'e', 'b', 3}, {'e', 'c', 5}, {'e', 'd', 9}, {'e', 'f', 1}, {'f', 'b', 5}, {'f', 'd', 3}, {'f', 'e', 1}}, 'f', {10, 4, 4, 3, 1, 0}, {'d','e','d','f','f','-'}},
 };
+
 dijkstra_test ptests[] = {
 	// Basic
 	{2, {'a','b'}, 1, {{'a','b',1}}, 'a', {INFINITY,1}, {'-','a'}},
@@ -108,6 +112,7 @@ dijkstra_test ptests[] = {
 	{6, {'a','b','c','d','e','f'},8, {{'a','b',2},{'a','c',1},{'b','d',5},{'b','e',7},{'c','d',4},{'c','f',13},{'d','e',1},{'e','f',5}}, 'e', {1,2,4,1,INFINITY,5}, {'c','a','d','e','-','e'}},
 	{6, {'a','b','c','d','e','f'},8, {{'a','b',2},{'a','c',1},{'b','d',5},{'b','e',7},{'c','d',4},{'c','f',13},{'d','e',1},{'e','f',5}}, 'f', {1,2,4,1,5,INFINITY}, {'c','a','d','e','f','-'}},
 };
+
 flwa_test flwatests[] = {
 	// Basic
 	{1, {'a'}, 0, {{0}}, {{0}}},
