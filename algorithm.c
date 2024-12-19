@@ -140,6 +140,22 @@ void adj_list_to_adj_matrix (pnode G, double W[MAXNODES][MAXNODES]){
 	}
 }
 
+void init_pi(pnode G){
+	pnode node_iter = G;
+	for(int i=0; i<node_cardinality(G)-1; i++){
+		set_pi(node_iter, '-');
+		node_iter = get_next(node_iter);
+	}
+}
+
+void init_d(pnode G){
+	pnode node_iter = G;
+	for(int i=0; i<node_cardinality(G)-1; i++){
+		set_d(node_iter, INFINITY);
+		node_iter = get_next(node_iter);
+	}
+}
+
 //--------------------------------------------------------------------------
 // Dijkstra's algorithm, single source shortest path tree generator
 // a -> b(1) -> c(5)
@@ -150,6 +166,7 @@ void dijkstra(pnode G, char s, double *d, char *e)
 {
 	// initalize distance attributes
 	init_single_source(G,s);
+	init_pi(G);
 
 	// start-index
 	int array_index=0;
@@ -167,12 +184,18 @@ void dijkstra(pnode G, char s, double *d, char *e)
 		
 		// insert into arrays
 		d[array_index] = get_d(min_d_node);
-		e[array_index] = get_name(min_d_node) == s ? '-' : get_name(min_d_node);
+		e[array_index] = get_pi(min_d_node);
 		array_index++;
 
-		for(pedge edg = get_edges(min_d_node); edg < edge_cardinality(min_d_node); edg=get_next_edge(edg)){
+		pedge edg = get_edges(min_d_node);
+		for(int i=0; i <edge_cardinality(min_d_node); i++)
+		{
 			pnode adj_node = get_node(G, edg->to);
+			int prev_d_adj_node = get_d(adj_node);
 			relax(min_d_node, adj_node, get_weight(edg));
+			if(get_d(adj_node) != prev_d_adj_node)
+				set_pi(adj_node, get_name(min_d_node));
+			edg=get_next_edge(edg);
 		}
 		qsize--;
 	}
@@ -192,8 +215,6 @@ void prim(pnode G, char start_node, double *d, char *e)
 
 	// initialize arrays
 	int array_index=0;
-	d[array_index] = INFINITY;
-	e[array_index] = '-';
 
 	// Calculate qsize
 	int qsize = node_cardinality(G);
@@ -208,17 +229,27 @@ void prim(pnode G, char start_node, double *d, char *e)
 		pnode min_d_node = Q_extract_min(Q,qsize);
 
 		// insert into arrays
-		array_index++;
-		e[array_index] = get_name(min_d_node);
-		d[array_index] = get_d(min_d_node);
+		if(array_index != 0)
+			d[array_index] = get_d(min_d_node);
+		else
+			d[array_index] = INFINITY;
+		e[array_index] = get_pi(min_d_node);
 
-		for(pedge edg = get_edges(min_d_node); edg < edge_cardinality(min_d_node); edg=get_next_edge(edg)){
+
+		pedge edg = get_edges(min_d_node);
+		for(int i=0; i <edge_cardinality(min_d_node); i++)
+		{
 			pnode adj_node = get_node(G, edg->to);
-			if(Q_exists(Q,qsize,get_name(adj_node)) && get_d(min_d_node)+get_weight(edg) < get_d(adj_node)){
-				set_d(adj_node, get_d(min_d_node)+get_weight(edg));
+			if(Q_exists(Q,qsize,get_name(adj_node)) && get_d(min_d_node)+get_weight(edg) < get_d(adj_node))
+			{
+		 		set_d(adj_node, get_d(min_d_node)+get_weight(edg));
+				set_pi(adj_node, get_name(min_d_node));
 			}
+
+			edg=get_next_edge(edg);
 		}
 		qsize--;
+		array_index++;
 	}
 }
 
@@ -261,7 +292,7 @@ void warshall(pnode G, double W[MAXNODES][MAXNODES])
 	for(int k=0; k<number_nodes; k++){
 		for(int i=0; i<number_nodes; i++){
 			for(int j=0; j<number_nodes; j++){
-				W[i][j] = max(W[i][j], W[i][k] + W[k][j]);
+				W[i][j] = (W[i][j] || (W[i][k] && W[k][j]));
 			}
 		}
 	}

@@ -487,18 +487,14 @@ void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES]) {
         return;
     }
 
-
     for (int i = 0; i < MAXNODES; i++) {
         for (int j = 0; j < MAXNODES; j++) {
             matrix[i][j] = 0;
         }
     }
-
     
     for (int i = 0; i < node_cardinality(G); i++) {
-        pnode current = get_node(G, pos_to_name(G, i));
-
-       
+        pnode current = get_node(G, pos_to_name(G, i));   
 
         pedge currentedge = get_edges(current);
         while (currentedge != NULL) {

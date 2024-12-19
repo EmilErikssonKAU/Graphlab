@@ -1,4 +1,4 @@
-CFLAGS = -Wall
+CFLAGS = -Wall -g
 # Remove this -lm flag on Mac
 LDLIBS = -lm
 
