@@ -105,7 +105,7 @@ pnode node_cons(pnode first, pnode second)
 pnode add_node(pnode G, char nname)
 {
 
-	if(G == NULL){
+	if(is_empty(G)){
 		G = create_node(nname);
 		return G;
 	}
@@ -118,14 +118,14 @@ pnode add_node(pnode G, char nname)
 	pnode current = G;
 	pnode newnode = create_node(nname);
 
-	if(nname < G->name){
+	if(nname < get_name(G)){
 		node_cons(newnode, G);
 		return newnode;
 	}
-	while (current->next_node != NULL && current->next_node->name < newnode->name){
-		current = current->next_node;
+	while (get_next(current) != NULL &&  get_name(get_next(current))  < get_name(newnode)){
+		current = get_next(current);
 	}
-	node_cons(newnode, current->next_node);
+	node_cons(newnode, get_next(current));
 	node_cons(current, newnode);
 
 	return G;
@@ -143,22 +143,20 @@ pnode rem_node(pnode G, char name)
 		return G;
 	}
 
-	if (G->name == name){
-		G = G->next_node;
+	if (get_name(G) == name){
+		G = get_next(G);
 		return G;
 	}
 
 	pnode current = G; 
 
-	while(current->next_node != NULL){
-		printf("%c   ", 	current->name);
-		printf("%c   \n", 	name);
-
-		if(current->next_node->name == name){
-			node_cons(current, current->next_node->next_node);
+	while(get_next(current)!= NULL){
+	
+			if(get_name((get_next(current))) == name){
+			node_cons(current, get_next((get_next(current))));
 			break;
 		}
-		current = current->next_node;
+		current = get_next(current);
 	}
 	 
 	return G; 
@@ -169,12 +167,12 @@ pnode rem_node(pnode G, char name)
 pnode get_node(pnode G, char name)
 {
 
-	while(G->next_node != NULL){
+	while(get_next(G) != NULL){
 
-		if(G->name == name){
+		if(get_name(G) == name){
 			break; 
 		}
-		G = G->next_node;
+		G = get_next(G);
 	}
 	return G;
 
@@ -254,9 +252,7 @@ pedge edge_cons(pedge first, pedge second)
 // upd_edge: updates edge E to new weight
 pedge upd_edge(pedge E, double weight)
 {
-	// TODO
-
-	
+	set_weight(E, weight);
 	return E;
 }
 
@@ -269,19 +265,18 @@ pedge _add_edge(pedge E, char to, double weight)
 	}
 
 	pedge newedge = create_edge(to, weight);
-	pedge current = E;
+	pedge current_edge = E;
 	
-	if(to < E->to){
+	if(to < get_to(E)){
 		edge_cons(newedge, E);
 		return newedge;
 	}
 
-
-	while (current->next_edge != NULL && current->next_edge->to < newedge->to){
-		current = current->next_edge;
+	while ( get_next_edge(current_edge) != NULL &&  get_to(get_next_edge(current_edge)) < get_to(newedge)){
+		current_edge =   get_next_edge(current_edge);
 	}
-	edge_cons(newedge, current->next_edge);
-	edge_cons(current, newedge);
+	edge_cons(newedge		, 	get_next_edge(current_edge));
+	edge_cons(current_edge	,	newedge);
 
 
 	return E;
@@ -296,7 +291,7 @@ void add_edge(pnode G, char from, char to, double weight)
 
 	pnode current = get_node(G, from);
 
-	current->edges = _add_edge(current->edges, to, weight);
+	set_edges(G, _add_edge(get_edges(current), to, weight));
 
 }
 
@@ -309,11 +304,11 @@ bool _find_edge(pedge E, char to)
 	}
 
 	else{
-		if(E->to == to){
+		if(get_to(E) == to){
 			return true;
 		}
 		else{
-			_find_edge(E->next_edge, to);
+			_find_edge(get_next_edge(E), to);
 		}
 	}
 
@@ -328,7 +323,7 @@ bool find_edge(pnode G, char from, char to)
 	
 	pnode current = get_node(G, from);
 
-	if(_find_edge(current->edges, to)){
+	if(_find_edge(get_edges(current), to)){
 		return true; 
 		}
 	else{
@@ -336,7 +331,7 @@ bool find_edge(pnode G, char from, char to)
 	}
 	
 	
-	// TODO
+	
 
 	
 }
@@ -350,8 +345,8 @@ int _edge_cardinality(pedge E)
 		return 0;
 	}
 	int count  = 0; 
-	while(E->next_edge != NULL){
-		E = E->next_edge;
+	while(get_next_edge(E) != NULL){
+		E = get_next_edge(E);
 		count++;
 	}
 	return count;
@@ -369,13 +364,11 @@ int edge_cardinality(pnode G)
 	int count = 0;
 
 	while(G->next_node != NULL){
-		count = count + _edge_cardinality(G->edges);
-		G = G->next_node;
-
+		count = count + _edge_cardinality(get_edges(G));
+		G = get_next(G);
 		}
 
 	return count; 
-	
 }
 
 
@@ -383,8 +376,28 @@ int edge_cardinality(pnode G)
 //              source node
 int _self_loops(pedge E, char src)
 {
-	// TODO
-	return 0;
+	if(edge_empty(E)){
+		return 0;
+	}
+
+
+	
+	int count = 0;
+
+	pedge current_edge = E;  
+	
+	while (current_edge != NULL ){
+		
+
+		if(current_edge->to == src){
+			count++;
+		}
+		current_edge = current_edge->next_edge;
+	}
+
+	return count; 
+	
+
 }
 
 
@@ -392,7 +405,39 @@ int _self_loops(pedge E, char src)
 //             the same node
 int self_loops(pnode G)
 {
-	// TODO
+
+	if(is_empty(G)){
+		return 0;
+	}
+
+
+
+	pnode current_node = G;
+
+	int count = 0;
+
+
+
+
+
+	while(!is_empty(current_node)){
+		
+		count = count + _self_loops(get_edges(current_node), get_name(current_node));
+
+
+		current_node = get_next(current_node);
+
+	}
+
+
+	return count;
+
+
+	
+	
+
+	//todo
+
 	return 0;
 }
 
@@ -400,9 +445,30 @@ int self_loops(pnode G)
 // _rem_edge: removes edge from edge-list
 pedge _rem_edge(pedge E, char to)
 {
-	// TODO
-	return E;
+	
+if (_find_edge(E, to) == false) {
+		printf("node does not exist \n");
+		return E;
+	}
 
+	if (get_to(E) == to){
+		E = get_next_edge(E);
+		return E;
+	}
+
+	pedge current = E; 
+
+	while(get_next_edge(current) != NULL){
+	
+
+		if(get_to(current) == to){
+			edge_cons(current, get_next_edge(get_next_edge(current)));
+			break;
+		}
+		current = get_next_edge(current);
+	}
+	 
+	return E; 
 
 
 }
@@ -411,21 +477,63 @@ pedge _rem_edge(pedge E, char to)
 // rem_edge: removes edge from G
 void rem_edge(pnode G, char from, char to)
 {
-	// TODO
+
+	pnode curent = get_node(G, from);
+
+	_rem_edge(get_edges(curent), to);
 }
 
 
 // remove_all_edges_to: removes all edges going towards node with name name
 void remove_all_edges_to(pnode G, char name)
 {
-	// TODO
+	if(is_empty(G)){
+		return;
+	}
+
+	pnode current_node = G;
+
+
+	while(current_node != NULL){
+		
+		//pedge temp = get_edges(current_node); 
+		current_node = get_next(current_node); 
+		_rem_edge(get_edges(current_node), name);
+
+
+		
+
+
+	
+	}
+
+	
+
 }
 
 
 // remove_all_edges_from: removes all edges from node with name name
 void remove_all_edges_from(pnode G, char name)
 {
-	// TODO
+	
+	
+	pnode current_node = get_node(G, name);
+
+
+	pedge current_edge = get_edges(current_node);
+
+	while(current_edge != NULL){
+		pedge temp = current_edge; 
+        current_edge = get_next_edge(current_edge);  
+        free(temp); 
+	}  
+
+	set_edges(current_node, NULL);
+	
+
+	
+
+
 }
 
 
@@ -439,8 +547,8 @@ int node_cardinality(pnode G)
 
 
 	int count  = 0; 
-	while(G->next_node != NULL){
-		G = G->next_node;
+	while(get_next(G) != NULL){
+		G = get_next(G);
 		count++;
 	}
 
@@ -457,10 +565,10 @@ int name_to_pos(pnode G, char c)
 
 	while(G != NULL){
 
-		if(G->name == c){
+		if(get_name(G) == c){
 			return count; 
 		}
-		G = G->next_node;
+		G = get_next(G);
 		count++;
 	}
 	
@@ -475,7 +583,7 @@ char pos_to_name(pnode G, int pos)
 		return '-';
 	} 
 	for(int i = 0; i < pos; i++){
-		G = G->next_node;
+		G = get_next(G);
 	}
 	return G->name;	
 }
@@ -498,13 +606,11 @@ void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES]) {
     for (int i = 0; i < node_cardinality(G); i++) {
         pnode current = get_node(G, pos_to_name(G, i));
 
-       
-
         pedge currentedge = get_edges(current);
         while (currentedge != NULL) {
-            int pos = name_to_pos(G, currentedge->to);
+            int pos = name_to_pos(G, get_to(currentedge));
                 matrix[i][pos] = 1;
-            currentedge = currentedge->next_edge;
+            currentedge =  get_next_edge(currentedge);
         }
     }
 }
