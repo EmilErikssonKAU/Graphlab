@@ -201,6 +201,7 @@ void dijkstra(pnode G, char s, double *d, char *e)
 	}
 }
 
+
 //--------------------------------------------------------------------------
 // Prim's algorithm - Minimum Spanning Tree generator
 // start_node: a
