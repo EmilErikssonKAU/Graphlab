@@ -162,21 +162,6 @@ void adj_list_to_adj_matrix(pnode G, double W[MAXNODES][MAXNODES], bool floyd){
 	}
 }
 
-void init_pi(pnode G){
-	pnode node_iter = G;
-	for(int i=0; i<node_cardinality(G)-1; i++){
-		set_pi(node_iter, '-');
-		node_iter = get_next(node_iter);
-	}
-}
-
-void init_d(pnode G){
-	pnode node_iter = G;
-	for(int i=0; i<node_cardinality(G)-1; i++){
-		set_d(node_iter, INFINITY);
-		node_iter = get_next(node_iter);
-	}
-}
 
 double get_w_of_last_edge(pnode graph ,pnode G){
 	if(get_pi(G) == '-')
@@ -197,9 +182,8 @@ int char_to_index(char c){
 //--------------------------------------------------------------------------
 void dijkstra(pnode G, char s, double *d, char *e)
 {
-	// initalize distance attributes
+	// initalize d and pi attributes
 	init_single_source(G,s);
-	init_pi(G);
 
 	// start-index
 	int array_index=0;
@@ -214,23 +198,31 @@ void dijkstra(pnode G, char s, double *d, char *e)
 	while(!Q_is_empty(Q,qsize)){
 		// get minimium distance node
 		pnode min_d_node = Q_extract_min(Q,qsize);
+
+		// get array_index of min_d_node
+		int array_index = char_to_index(get_name(min_d_node));
 		
 		// insert into arrays
 		d[array_index] = get_d(min_d_node);
 		e[array_index] = get_pi(min_d_node);
-		array_index++;
 
+		// start iteration through edges connected to min_d_node
 		pedge edg = get_edges(min_d_node);
-		for(int i=0; i <edge_cardinality(min_d_node); i++)
+		while(edg != NULL)
 		{
-			if(edg==NULL)
-				break;
+			// get node connected to the edge
 			pnode adj_node = get_node(G, edg->to);
+
+			// store d of adj_node before relax
 			int prev_d_adj_node = get_d(adj_node);
+
 			relax(min_d_node, adj_node, get_weight(edg));
+
+			// if relax changed d then change pi to match
 			if(get_d(adj_node) != prev_d_adj_node)
 				set_pi(adj_node, get_name(min_d_node));
-			edg=get_next_edge(edg);
+
+			edg = get_next_edge(edg);
 		}
 		qsize--;
 	}
@@ -246,7 +238,7 @@ void dijkstra(pnode G, char s, double *d, char *e)
 //--------------------------------------------------------------------------
 void prim(pnode G, char start_node, double *d, char *e)
 {
-	// initalize distance attributes
+	// initalize d and pi attributes
 	init_single_source(G,start_node);
 
 	// Calculate qsize
@@ -256,33 +248,35 @@ void prim(pnode G, char start_node, double *d, char *e)
 	queue Q = create_Q(qsize);
 	fill_Q(Q,G,qsize);
 
+	// index of start_node
+	int start_index = char_to_index(start_node);
+
 	// Loop through queue
 	while(!Q_is_empty(Q,qsize)){
 		// get minimium distance node
 		pnode min_d_node = Q_extract_min(Q,qsize);
 
+		// get array_index of min_d_node
 		int array_index = char_to_index(get_name(min_d_node));
 
-		// insert distance to node into array d
-		d[array_index] = get_w_of_last_edge(G,min_d_node);
+		// insert distance to node into array d, if start node, set distance to INFINITY
+		d[array_index] = array_index != start_index ? get_d(min_d_node) : INFINITY;
 		// insert previous node into array e
 		e[array_index] = get_pi(min_d_node);
 
 		// start iteration through edges connected to min_d_node
 		pedge edg = get_edges(min_d_node);
-		for(int i=0; i <edge_cardinality(min_d_node); i++)
+		while(edg != NULL)
 		{
-			// if edge is null => no edges. i.e. we need to break
-			if(edg==NULL)
-				break;
 			// get node connected to the edge
 			pnode adj_node = get_node(G, edg->to);
 
 			// if adj_node still in Q i.e. not already in tree
 			// and new path is shorter then update d and pi
-			if(Q_exists(Q,qsize,get_name(adj_node)) && get_d(min_d_node)+get_weight(edg) < get_d(adj_node))
+
+			if(Q_exists(Q,qsize,get_name(adj_node)) && get_weight(edg) < get_d(adj_node))
 			{
-		 		set_d(adj_node, get_d(min_d_node)+get_weight(edg));
+				set_d(adj_node, get_weight(edg));
 				set_pi(adj_node, get_name(min_d_node));
 			}
 
