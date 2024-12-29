@@ -114,28 +114,50 @@ void fill_Q(queue Q, pnode G, int qsize){
 }
 
 
-void adj_list_to_adj_matrix (pnode G, double W[MAXNODES][MAXNODES]){
+void adj_list_to_adj_matrix(pnode G, double W[MAXNODES][MAXNODES], bool floyd){
+	// number of nodes in G, => number of rows/columns needed in W
 	int number_nodes = node_cardinality(G);
 
-	// fill matrix with distance inf or 0
+	// if floyd => a = 0 and b = infinity
+	// if warshall => a = 1 and b = 0
+
+	double a = floyd ? 0 : 1;
+	double b = floyd ? INFINITY : 0;
+
+	//fill matrix with distance a to oneself and b to other nodes
+	//[a   b   b  ]
+	//[b   a   b  ]
+	//[b   b   a  ]
+
 	for(int i=0; i<number_nodes; i++){
 		for(int j=0; j<number_nodes; j++){
-			W[i][j] = i==j ? 0 : INFINITY;
+			W[i][j] = i==j ? a : b;
 		}
 	}
 
-	// insert distance not inf or 0
+	// start iteration through nodes in G
 	pnode node_iter = G;
 	for(int i=0; i<number_nodes; i++){
+		// number of edges connected to current node
 		int number_edges = edge_cardinality(node_iter);
+		// first edge connected to current node
 		pedge edge_iter = get_edges(node_iter);
 
 		for(int j=0; j<number_edges; j++){
+			// if edge is null => no edges. i.e. we need to break
+			if(edge_iter == NULL)
+				break;
+
+			// get edge weight
 			int weight = get_weight(edge_iter);
+			// get position of node that edge connects to
 			int node_pos = name_to_pos(G,edge_iter->to);
+			// insert weight into W
 			W[i][node_pos] = weight;
+			// get next edge
 			edge_iter = get_next_edge(edge_iter);
 		}
+		// get next node
 		node_iter = get_next(node_iter);
 	}
 }
@@ -264,7 +286,7 @@ void prim(pnode G, char start_node, double *d, char *e)
 //--------------------------------------------------------------------------
 void floyd(pnode G, double W[MAXNODES][MAXNODES])
 {
-	adj_list_to_adj_matrix(G,W);
+	adj_list_to_adj_matrix(G,W,true);
 	int number_nodes = node_cardinality(G);
 
 	for(int k=0; k<number_nodes; k++){
@@ -287,13 +309,13 @@ void floyd(pnode G, double W[MAXNODES][MAXNODES])
 //--------------------------------------------------------------------------
 void warshall(pnode G, double W[MAXNODES][MAXNODES])
 {
+	adj_list_to_adj_matrix(G,W,false);
 	int number_nodes = node_cardinality(G);
-	list_to_matrix(G,W);
 
 	for(int k=0; k<number_nodes; k++){
 		for(int i=0; i<number_nodes; i++){
 			for(int j=0; j<number_nodes; j++){
-				W[i][j] = (W[i][j] || (W[i][k] && W[k][j]));
+				W[i][j] = (W[i][j] || (W[i][k] && W[k][j]));;
 			}
 		}
 	}
