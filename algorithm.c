@@ -178,6 +178,17 @@ void init_d(pnode G){
 	}
 }
 
+double get_w_of_last_edge(pnode graph ,pnode G){
+	if(get_pi(G) == '-')
+		return INFINITY;
+	else
+		return get_d(G) - get_d(get_node(graph,get_pi(G)));
+}
+
+int char_to_index(char c){
+	return c - 97;
+}
+
 //--------------------------------------------------------------------------
 // Dijkstra's algorithm, single source shortest path tree generator
 // a -> b(1) -> c(5)
@@ -212,6 +223,8 @@ void dijkstra(pnode G, char s, double *d, char *e)
 		pedge edg = get_edges(min_d_node);
 		for(int i=0; i <edge_cardinality(min_d_node); i++)
 		{
+			if(edg==NULL)
+				break;
 			pnode adj_node = get_node(G, edg->to);
 			int prev_d_adj_node = get_d(adj_node);
 			relax(min_d_node, adj_node, get_weight(edg));
@@ -236,9 +249,6 @@ void prim(pnode G, char start_node, double *d, char *e)
 	// initalize distance attributes
 	init_single_source(G,start_node);
 
-	// initialize arrays
-	int array_index=0;
-
 	// Calculate qsize
 	int qsize = node_cardinality(G);
 
@@ -251,18 +261,25 @@ void prim(pnode G, char start_node, double *d, char *e)
 		// get minimium distance node
 		pnode min_d_node = Q_extract_min(Q,qsize);
 
-		// insert into arrays
-		if(array_index != 0)
-			d[array_index] = get_d(min_d_node);
-		else
-			d[array_index] = INFINITY;
+		int array_index = char_to_index(get_name(min_d_node));
+
+		// insert distance to node into array d
+		d[array_index] = get_w_of_last_edge(G,min_d_node);
+		// insert previous node into array e
 		e[array_index] = get_pi(min_d_node);
 
-
+		// start iteration through edges connected to min_d_node
 		pedge edg = get_edges(min_d_node);
 		for(int i=0; i <edge_cardinality(min_d_node); i++)
 		{
+			// if edge is null => no edges. i.e. we need to break
+			if(edg==NULL)
+				break;
+			// get node connected to the edge
 			pnode adj_node = get_node(G, edg->to);
+
+			// if adj_node still in Q i.e. not already in tree
+			// and new path is shorter then update d and pi
 			if(Q_exists(Q,qsize,get_name(adj_node)) && get_d(min_d_node)+get_weight(edg) < get_d(adj_node))
 			{
 		 		set_d(adj_node, get_d(min_d_node)+get_weight(edg));
@@ -272,7 +289,6 @@ void prim(pnode G, char start_node, double *d, char *e)
 			edg=get_next_edge(edg);
 		}
 		qsize--;
-		array_index++;
 	}
 }
 
