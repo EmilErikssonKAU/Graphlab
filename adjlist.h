@@ -10,25 +10,25 @@
 // pedge - pointer to an edge
 typedef struct edge *pedge;
 // edge - defines an edge structure
-typedef struct edge {
-	double weight;    // weight of edge
-	char to;          // end node
-	//char from;
+typedef struct edge
+{
+	double weight; // weight of edge
+	char to;	   // end node
+	// char from;
 	pedge next_edge;
 } edge;
 
 // pnode - pointer to a node
 typedef struct node *pnode;
 // node - defines a node structure, used for making adjacency lists
-typedef struct node {
-	char name;        // name of node
-	double d;         // only used in algorithms for distance
-	char pi;          // only used in algorithms for neighbor
-	pedge edges;      // pointer to first (if any) edge from node
-	pnode next_node;  // pointer to next node (if any) in adjlist
+typedef struct node
+{
+	char name;		 // name of node
+	double d;		 // only used in algorithms for distance
+	char pi;		 // only used in algorithms for neighbor
+	pedge edges;	 // pointer to first (if any) edge from node
+	pnode next_node; // pointer to next node (if any) in adjlist
 } node;
-
-
 
 bool is_empty(pnode G);
 char get_name(pnode G);
@@ -54,7 +54,4 @@ char pos_to_name(pnode G, int pos);
 void list_to_matrix(pnode G, double matrix[MAXNODES][MAXNODES]);
 int self_loops(pnode G);
 
-// tillagd "själva"
-pedge get_next_edge(pedge E);
-double get_weight(pedge E);
 #endif
